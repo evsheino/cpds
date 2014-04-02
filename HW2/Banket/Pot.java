@@ -28,7 +28,7 @@ public class Pot {
         if (hungrySavages == 0) notifyAll();
     }
 
-    public boolean isBanketFinished() {
+    public synchronized boolean isBanketFinished() {
         return hungrySavages == 0;
     }
 
