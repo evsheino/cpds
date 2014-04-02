@@ -1,0 +1,1 @@
+The getserving method of BadPot is not synchronized so multiple threads can enter it at the same time. Servings may run out after the check that there are enough servings and thus savages could eat out of an empty pot.
