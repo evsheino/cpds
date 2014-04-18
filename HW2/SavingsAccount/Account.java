@@ -4,7 +4,7 @@ public class Account {
 
     public Account() { }
 
-    public synchronized boolean withdraw(int amount) {
+    public synchronized boolean withdraw(int amount) throws InterruptedException {
         if (balance-amount < 0) wait();
         balance -= amount;
         System.out.println("balance:" + balance);

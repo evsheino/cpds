@@ -1,0 +1,29 @@
+const False = 0
+const True = 1
+
+const RMAX = 1
+const FMAX = 2
+
+range Bool = False..True
+range R = 0..RMAX
+range F = 1..FMAX
+
+FLIGHT = (request_runway -> WAIT),
+WAIT = (free[i:R] -> take_off[i] -> FLIGHT).
+
+//Solution 1a
+CONTROL_RUNWAY =  CONTROL_RUNWAY [False],
+CONTROL_RUNWAY[busy:Bool] = (when (!busy) free -> CONTROL_RUNWAY[True]
+							|take_off -> CONTROL_RUNWAY[False]).
+
+||CONTROL = (runway [R]:CONTROL_RUNWAY).
+
+
+||AIRPORT = (flight[F]:FLIGHT || flight[F]::CONTROL)
+			  / {flight.[f:F].runway.[i:R].free/flight.[f].free.[i], 
+				 flight.[f:F].runway.[i:R].take_off/flight.[f].take_off.[i]}.
+
+// Solution 1b
+property MUTEX =(flight[x:F].runway[i:R].free -> flight[F].runway[i].take_off -> MUTEX).
+
+||SAFE_AIRPORT = (AIRPORT || MUTEX).
