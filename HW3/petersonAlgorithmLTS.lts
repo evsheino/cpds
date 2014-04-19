@@ -1,0 +1,47 @@
+const False = 0
+const True  = 1
+range Bool  = False..True
+range Card = 1..2
+set   BoolActions = {setTrue, setFalse, [False], [True]}
+set   CardActions = {set1, set2, [1], [2]}
+
+BOOLVAR = VAL[False],
+VAL[v:Bool] = (setTrue  -> VAL[True]
+              |setFalse -> VAL[False]
+              |[v]      -> VAL[v]
+              ).
+
+CARDVAR = CARD[1],
+CARD[i:Card] = (set1  -> CARD[1]
+               |set2  -> CARD[2]
+               |[i]   -> CARD[i]
+               ).
+
+||FLAGS = (flag1:BOOLVAR || flag2:BOOLVAR).
+||TURNS = (turn1:CARDVAR || turn2:CARDVAR).
+
+NEIGHBOUR1 = (flag1.setTrue -> turn1.set2 -> TEST),
+TEST       = (flag2[b:Bool] ->
+                 			if(b) then(flag1.setFalse -> turn1.set1 -> NEIGHBOUR1)
+						    else 
+							(turn1.set1 -> enter -> exit -> flag1.setFalse -> NEIGHBOUR1)
+             )+{{flag1,flag2}.BoolActions,{turn1,turn2}.CardActions}.
+
+NEIGHBOUR2 = (flag2.setTrue -> turn2.set1 -> TEST),
+TEST       = (flag1[b:Bool] ->
+                 			if(b) then(flag2.setFalse -> turn2.set2 -> NEIGHBOUR2)
+                			else 
+							(turn2.set2 -> enter -> exit -> flag2.setFalse -> NEIGHBOUR2)
+              )+{{flag1,flag2}.BoolActions, {turn1,turn2}.CardActions}.
+
+
+property MUTEX = (alice.enter -> alice.exit -> MUTEX | bob.enter -> bob.exit -> MUTEX).
+
+||FIELD = (alice:NEIGHBOUR1 || bob:NEIGHBOUR2 || {alice,bob}::FLAGS || {alice,bob}::TURNS || MUTEX).
+
+progress ENTER1  = {alice.enter}  //NEIGBOUR 1 always gets to enter
+progress ENTER2  = {bob.enter}  //NEIGHBOUR 2 always gets to enter
+
+/* greedy neighbours - make setting the flags high priority - eagerness to enter*/
+
+||GREEDY_FIELD = FIELD << {{alice,bob}.{flag1,flag2}.setTrue}.
