@@ -18,12 +18,12 @@ CONTROL_RUNWAY[busy:Bool] = (when (!busy) free -> CONTROL_RUNWAY[True]
 
 ||CONTROL = (runway [R]:CONTROL_RUNWAY).
 
-
 ||AIRPORT = (flight[F]:FLIGHT || flight[F]::CONTROL)
 			  / {flight.[f:F].runway.[i:R].free/flight.[f].free.[i], 
 				 flight.[f:F].runway.[i:R].take_off/flight.[f].take_off.[i]}.
 
 // Solution 1b
-property MUTEX =(flight[x:F].runway[i:R].free -> flight[F].runway[i].take_off -> MUTEX).
+property MUTEX=(runway[r:R].free -> runway[r].take_off -> MUTEX).
+||P= forall [x:F] flight[x]: MUTEX.
 
-||SAFE_AIRPORT = (AIRPORT || MUTEX).
+||SAFE_AIRPORT = (AIRPORT || P).
