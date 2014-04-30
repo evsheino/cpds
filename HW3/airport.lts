@@ -27,3 +27,9 @@ property MUTEX=(runway[r:R].free -> runway[r].take_off -> MUTEX).
 ||P= forall [x:F] flight[x]: MUTEX.
 
 ||SAFE_AIRPORT = (AIRPORT || P).
+
+//Solution 1c
+progress TAKEOFF = {flight[f:F].runway[r:R].take_off}
+// The progress property checks that each flight can take off from any runway.
+
+||AIRPORT_STRESS = (SAFE_AIRPORT)<<{flight[f:F].request_runway}.
